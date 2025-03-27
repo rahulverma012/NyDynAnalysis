@@ -22,6 +22,32 @@ int GetRndmRandomNumber(TRandom3 &randomGenerator, int Length){
   return randomValue;
 }
 
+template<typename T>
+void GetMeanAndErrorFromSubSampling(double X_Mean[], double X_Sigma[], 
+  const T&SubSampleArr
+) {
+    double X_Sum [nClass] ;
+    double X_Sum2[nClass] ;
+
+    for(int iClass = 0 ; iClass < nClass ; iClass++){
+      X_Sum [iClass] = 0;
+      X_Sum2[iClass] = 0;
+      for(int iSubSample = 0; iSubSample < nSubSample; iSubSample++){
+        X_Sum [iClass] += SubSampleArr[iSubSample][iClass];
+        X_Sum2[iClass] += std::pow(SubSampleArr[iSubSample][iClass], 2.0);
+      }
+
+      X_Mean[iClass] = X_Sum[iClass]/nSubSample;
+      double tempVal =   X_Sum2[iClass] 
+                      + nSubSample*std::pow(X_Mean[iClass],2)
+                      - 2.0*X_Mean[iClass]*X_Sum[iClass];
+
+      double sigma2 = tempVal/static_cast<double>(nSubSample-1);
+      double error  = std::sqrt(sigma2/nSubSample);
+      X_Sigma[iClass] = error; 
+    }
+}
+
 template<typename T> 
 int64_t FindEntriesPerSubSample(T hist, int nSubSample){
   cout<<endl<<"Finding Entries Per SubSample"<<endl;
