@@ -1,6 +1,14 @@
+#include <chrono>
 const int nClass = 5;
 const int nSubSample = 10;
 unsigned int seed = 123456789; // Seed value; you can change it to any fixed integer
+
+template<typename T>
+void PrintTime(T Start, std::string String){
+  auto Stop = chrono::high_resolution_clock::now();
+  auto Duration = duration_cast<microseconds>(Stop-Start);
+  cout<<String<<float(Duration.count())/float(1000000)<<" seconds"<<endl;
+}
 
 template<typename T> 
 int64_t FindEntriesPerSubSample(T hist, int nSubSample){
