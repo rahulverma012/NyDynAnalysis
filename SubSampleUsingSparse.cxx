@@ -10,6 +10,13 @@ void PrintTime(T Start, std::string String){
   cout<<String<<float(Duration.count())/float(1000000)<<" seconds"<<endl;
 }
 
+Int_t    GetBinFromTHnSparse(THnSparse* hsparse,Int_t AxisNo, double val ){ return hsparse->GetAxis(AxisNo)->FindBin(val);}
+Double_t GetBinWidthOfAxis  (THnSparse* hsparse,Int_t AxisNo, Int_t BinNo){ return hsparse->GetAxis(AxisNo)->GetBinWidth(BinNo);}
+Double_t GetBinCenterOfAxis (THnSparse* hsparse,Int_t AxisNo, Int_t BinNo){ return hsparse->GetAxis(AxisNo)->GetBinCenter(BinNo);}
+Double_t GetBinLowEdgeOfAxis(THnSparse* hsparse,Int_t AxisNo, Int_t BinNo){ return hsparse->GetAxis(AxisNo)->GetBinLowEdge(BinNo);}
+Double_t GetBinUpEdgeOfAxis (THnSparse* hsparse,Int_t AxisNo, Int_t BinNo){ return (hsparse->GetAxis(AxisNo)->GetBinLowEdge(BinNo)+hsparse->GetAxis(AxisNo)->GetBinWidth(BinNo));}
+
+
 template<typename T> 
 int64_t FindEntriesPerSubSample(T hist, int nSubSample){
   cout<<endl<<"Finding Entries Per SubSample"<<endl;
