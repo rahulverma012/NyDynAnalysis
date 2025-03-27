@@ -16,6 +16,11 @@ Double_t GetBinCenterOfAxis (THnSparse* hsparse,Int_t AxisNo, Int_t BinNo){ retu
 Double_t GetBinLowEdgeOfAxis(THnSparse* hsparse,Int_t AxisNo, Int_t BinNo){ return hsparse->GetAxis(AxisNo)->GetBinLowEdge(BinNo);}
 Double_t GetBinUpEdgeOfAxis (THnSparse* hsparse,Int_t AxisNo, Int_t BinNo){ return (hsparse->GetAxis(AxisNo)->GetBinLowEdge(BinNo)+hsparse->GetAxis(AxisNo)->GetBinWidth(BinNo));}
 
+int GetRndmRandomNumber(TRandom3 &randomGenerator, int Length){
+  int randomValue = randomGenerator.Rndm()*Length; // Uniform number between 0 and 1
+  if (randomValue == Length){ randomValue = Length -1;}
+  return randomValue;
+}
 
 template<typename T> 
 int64_t FindEntriesPerSubSample(T hist, int nSubSample){
