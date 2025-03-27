@@ -2,6 +2,20 @@ const int nClass = 5;
 const int nSubSample = 10;
 unsigned int seed = 123456789; // Seed value; you can change it to any fixed integer
 
+template<typename T> 
+int64_t FindEntriesPerSubSample(T hist, int nSubSample){
+  cout<<endl<<"Finding Entries Per SubSample"<<endl;
+  cout<<hist->GetName()<<" Total Entries = "<<std::setprecision(20)<<hist->GetEntries()<<endl;
+  int64_t TotalEntries = hist->GetEntries();
+  int64_t Entries = TotalEntries/nSubSample;
+  int64_t Remainder  = TotalEntries%nSubSample;
+  cout<<"Entries              = "<<Entries<<endl; //9995026
+  cout<<"Remainder            = "<<Remainder<<endl;
+  if( Remainder != 0){Entries++;}
+  cout<<endl;
+  // cout<<"Entries Per SubSample = "<<Entries<<endl;
+  return Entries;
+}
 
 template<typename T, typename G>
 void SparseAnalysis(const T& hSparse, const int& nClass, const std::vector<double> classLow, std::vector<double> classUp,
