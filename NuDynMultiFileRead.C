@@ -1388,95 +1388,127 @@ void SparseAnalysis(const T& hSparseList, const int& nClass, const std::vector<d
   //Variables for analysis
   int Na ;
   int Nb ;
+  //__NoMBWC - Start___________________________________________________________________
+    double nEntries[nClass] ;
+    double mean_Na[nClass]  ; double Sum_Na[nClass]   ;
+    double mean_Na2[nClass] ; double Sum_Na2[nClass]  ;// 2 represents square
+    double mean_Nb[nClass]  ; double Sum_Nb[nClass]   ;
+    double mean_Nb2[nClass] ; double Sum_Nb2[nClass]  ;
+    double mean_NaNb[nClass]; double Sum_NaNb[nClass] ;
 
-  double nEntries[nClass] ;
-  double mean_Na[nClass]  ; double Sum_Na[nClass]   ;
-  double mean_Na2[nClass] ; double Sum_Na2[nClass]  ;// 2 represents square
-  double mean_Nb[nClass]  ; double Sum_Nb[nClass]   ;
-  double mean_Nb2[nClass] ; double Sum_Nb2[nClass]  ;
-  double mean_NaNb[nClass]; double Sum_NaNb[nClass] ;
+    //debugger //debugging varaibles to check if everything is working
+    double mean_NaCorr[nClass] ; double Sum_NaCorr[nClass] ;
+    double mean_NbCorr[nClass] ; double Sum_NbCorr[nClass] ;
 
-  //debugger //debugging varaibles to check if everything is working
-  double mean_NaCorr[nClass] ; double Sum_NaCorr[nClass] ;
-  double mean_NbCorr[nClass] ; double Sum_NbCorr[nClass] ;
+    double Raa_Corr[nClass];
+    double Rbb_Corr[nClass];
+    double Rab_Corr[nClass];
+    // std::fill(&dN_PowerSum_nClass_NoCBWC[0][0], &dN_PowerSum_nClass_NoCBWC[0][0] + nClass*(nOrder+1), 0);
+    //Initialize all to zero
+    for (int iClass=0; iClass<nClass; iClass++){
+      nEntries[iClass]  = 0;
+      mean_Na[iClass]   = 0; Sum_Na[iClass]    = 0 ;
+      mean_Na2[iClass]  = 0; Sum_Na2[iClass]   = 0 ;
+      mean_Nb[iClass]   = 0; Sum_Nb[iClass]    = 0 ;
+      mean_Nb2[iClass]  = 0; Sum_Nb2[iClass]   = 0 ;
+      mean_NaNb[iClass] = 0; Sum_NaNb[iClass]  = 0 ;
 
-  double Raa_Corr[nClass];
-  double Rbb_Corr[nClass];
-  double Rab_Corr[nClass];
-  // std::fill(&dN_PowerSum_nClass_NoCBWC[0][0], &dN_PowerSum_nClass_NoCBWC[0][0] + nClass*(nOrder+1), 0);
-  //Initialize all to zero
-  for (int iClass=0; iClass<nClass; iClass++){
-    nEntries[iClass]  = 0;
-    mean_Na[iClass]   = 0; Sum_Na[iClass]    = 0 ;
-    mean_Na2[iClass]  = 0; Sum_Na2[iClass]   = 0 ;
-    mean_Nb[iClass]   = 0; Sum_Nb[iClass]    = 0 ;
-    mean_Nb2[iClass]  = 0; Sum_Nb2[iClass]   = 0 ;
-    mean_NaNb[iClass] = 0; Sum_NaNb[iClass]  = 0 ;
-
-    mean_NaCorr[iClass] = 0 ; Sum_NaCorr[iClass] = 0;
-    mean_NbCorr[iClass] = 0 ; Sum_NbCorr[iClass] = 0;
-  }
-
-  // 2 represents square in the following
+      mean_NaCorr[iClass] = 0 ; Sum_NaCorr[iClass] = 0;
+      mean_NbCorr[iClass] = 0 ; Sum_NbCorr[iClass] = 0;
+    }
+  //__NoMBWC - End  ___________________________________________________________________
+  //__Subsampling_NoMBWC - Start ______________________________________________________
   //Error Analysis Part
-  vector<vector<double>> nEntries_nSubSample(nSubSample, vector<double>(nClass));
-  double mean_Na_nSubSample   [nSubSample][nClass]; double Sum_Na_nSubSample   [nSubSample][nClass] ;
-  double mean_Na2_nSubSample  [nSubSample][nClass]; double Sum_Na2_nSubSample  [nSubSample][nClass] ;
-  double mean_Nb_nSubSample   [nSubSample][nClass]; double Sum_Nb_nSubSample   [nSubSample][nClass] ;
-  double mean_Nb2_nSubSample  [nSubSample][nClass]; double Sum_Nb2_nSubSample  [nSubSample][nClass] ;
-  double mean_NaNb_nSubSample [nSubSample][nClass]; double Sum_NaNb_nSubSample [nSubSample][nClass] ;
+    vector<vector<double>> nEntries_nSubSample(nSubSample, vector<double>(nClass));
+    double mean_Na_nSubSample   [nSubSample][nClass]; double Sum_Na_nSubSample   [nSubSample][nClass] ;
+    double mean_Na2_nSubSample  [nSubSample][nClass]; double Sum_Na2_nSubSample  [nSubSample][nClass] ;
+    double mean_Nb_nSubSample   [nSubSample][nClass]; double Sum_Nb_nSubSample   [nSubSample][nClass] ;
+    double mean_Nb2_nSubSample  [nSubSample][nClass]; double Sum_Nb2_nSubSample  [nSubSample][nClass] ;
+    double mean_NaNb_nSubSample [nSubSample][nClass]; double Sum_NaNb_nSubSample [nSubSample][nClass] ;
 
-  //debugger //debugging varaibles to check if everything is working
-  double mean_NaCorr_nSubSample[nSubSample][nClass] ; double Sum_NaCorr_nSubSample[nSubSample][nClass] ;
-  double mean_NbCorr_nSubSample[nSubSample][nClass] ; double Sum_NbCorr_nSubSample[nSubSample][nClass] ;
+    //debugger //debugging varaibles to check if everything is working
+    double mean_NaCorr_nSubSample[nSubSample][nClass] ; double Sum_NaCorr_nSubSample[nSubSample][nClass] ;
+    double mean_NbCorr_nSubSample[nSubSample][nClass] ; double Sum_NbCorr_nSubSample[nSubSample][nClass] ;
 
-  double Raa_Corr_nSubSample[nSubSample][nClass];
-  double Rbb_Corr_nSubSample[nSubSample][nClass];
-  double Rab_Corr_nSubSample[nSubSample][nClass];
-  
-  //Initialize all to zero _nSubSample[iSubSample]
-  for (int iClass=0; iClass<nClass; iClass++){
-    for( int iSubSample = 0; iSubSample<nSubSample; iSubSample++){
-      nEntries_nSubSample[iSubSample][iClass]  = 0;
-      mean_Na_nSubSample[iSubSample][iClass]   = 0; Sum_Na_nSubSample[iSubSample][iClass]    = 0 ;
-      mean_Na2_nSubSample[iSubSample][iClass]  = 0; Sum_Na2_nSubSample[iSubSample][iClass]   = 0 ;
-      mean_Nb_nSubSample[iSubSample][iClass]   = 0; Sum_Nb_nSubSample[iSubSample][iClass]    = 0 ;
-      mean_Nb2_nSubSample[iSubSample][iClass]  = 0; Sum_Nb2_nSubSample[iSubSample][iClass]   = 0 ;
-      mean_NaNb_nSubSample[iSubSample][iClass] = 0; Sum_NaNb_nSubSample[iSubSample][iClass]  = 0 ;
+    double Raa_Corr_nSubSample[nSubSample][nClass];
+    double Rbb_Corr_nSubSample[nSubSample][nClass];
+    double Rab_Corr_nSubSample[nSubSample][nClass];
+    
+    //Initialize all to zero _nSubSample[iSubSample]
+    for (int iClass=0; iClass<nClass; iClass++){
+      for( int iSubSample = 0; iSubSample<nSubSample; iSubSample++){
+        nEntries_nSubSample[iSubSample][iClass]  = 0;
+        mean_Na_nSubSample[iSubSample][iClass]   = 0; Sum_Na_nSubSample[iSubSample][iClass]    = 0 ;
+        mean_Na2_nSubSample[iSubSample][iClass]  = 0; Sum_Na2_nSubSample[iSubSample][iClass]   = 0 ;
+        mean_Nb_nSubSample[iSubSample][iClass]   = 0; Sum_Nb_nSubSample[iSubSample][iClass]    = 0 ;
+        mean_Nb2_nSubSample[iSubSample][iClass]  = 0; Sum_Nb2_nSubSample[iSubSample][iClass]   = 0 ;
+        mean_NaNb_nSubSample[iSubSample][iClass] = 0; Sum_NaNb_nSubSample[iSubSample][iClass]  = 0 ;
 
-      mean_NaCorr_nSubSample[iSubSample][iClass] = 0 ; Sum_NaCorr_nSubSample[iSubSample][iClass] = 0;
-      mean_NbCorr_nSubSample[iSubSample][iClass] = 0 ; Sum_NbCorr_nSubSample[iSubSample][iClass] = 0;
+        mean_NaCorr_nSubSample[iSubSample][iClass] = 0 ; Sum_NaCorr_nSubSample[iSubSample][iClass] = 0;
+        mean_NbCorr_nSubSample[iSubSample][iClass] = 0 ; Sum_NbCorr_nSubSample[iSubSample][iClass] = 0;
+      }
     }
-  }
+  //__Subsampling_NoMBWC - End  ______________________________________________________
+  //__MBWC part - Start ______________________________________________________________
+    double nEntries_nSmallClass  [nSmallClass];
+    double mean_Na_nSmallClass   [nSmallClass]; double Sum_Na_nSmallClass   [nSmallClass] ;
+    double mean_Na2_nSmallClass  [nSmallClass]; double Sum_Na2_nSmallClass  [nSmallClass] ;
+    double mean_Nb_nSmallClass   [nSmallClass]; double Sum_Nb_nSmallClass   [nSmallClass] ;
+    double mean_Nb2_nSmallClass  [nSmallClass]; double Sum_Nb2_nSmallClass  [nSmallClass] ;
+    double mean_NaNb_nSmallClass [nSmallClass]; double Sum_NaNb_nSmallClass [nSmallClass] ;
 
-  //_______________MBWC part______________________________________________________________________________
-  double nEntries_nSmallClass  [nSmallClass];
-  double mean_Na_nSmallClass   [nSmallClass]; double Sum_Na_nSmallClass   [nSmallClass] ;
-  double mean_Na2_nSmallClass  [nSmallClass]; double Sum_Na2_nSmallClass  [nSmallClass] ;
-  double mean_Nb_nSmallClass   [nSmallClass]; double Sum_Nb_nSmallClass   [nSmallClass] ;
-  double mean_Nb2_nSmallClass  [nSmallClass]; double Sum_Nb2_nSmallClass  [nSmallClass] ;
-  double mean_NaNb_nSmallClass [nSmallClass]; double Sum_NaNb_nSmallClass [nSmallClass] ;
+    //debugger //debugging varaibles to check if everything is working
+    double mean_NaCorr_nSmallClass[nSmallClass] ; double Sum_NaCorr_nSmallClass[nSmallClass] ;
+    double mean_NbCorr_nSmallClass[nSmallClass] ; double Sum_NbCorr_nSmallClass[nSmallClass] ;
 
-  //debugger //debugging varaibles to check if everything is working
-  double mean_NaCorr_nSmallClass[nSmallClass] ; double Sum_NaCorr_nSmallClass[nSmallClass] ;
-  double mean_NbCorr_nSmallClass[nSmallClass] ; double Sum_NbCorr_nSmallClass[nSmallClass] ;
+    double Raa_Corr_nSmallClass[nSmallClass];
+    double Rbb_Corr_nSmallClass[nSmallClass];
+    double Rab_Corr_nSmallClass[nSmallClass];
 
-  double Raa_Corr_nSmallClass[nSmallClass];
-  double Rbb_Corr_nSmallClass[nSmallClass];
-  double Rab_Corr_nSmallClass[nSmallClass];
+    //Initialize all to zero _nSubSample[iSubSample]
+      for( int iSmallClass = 0; iSmallClass < nSmallClass; iSmallClass++){
+        nEntries_nSmallClass[iSmallClass]  = 0;
+        mean_Na_nSmallClass[iSmallClass]   = 0; Sum_Na_nSmallClass[iSmallClass]    = 0 ;
+        mean_Na2_nSmallClass[iSmallClass]  = 0; Sum_Na2_nSmallClass[iSmallClass]   = 0 ;
+        mean_Nb_nSmallClass[iSmallClass]   = 0; Sum_Nb_nSmallClass[iSmallClass]    = 0 ;
+        mean_Nb2_nSmallClass[iSmallClass]  = 0; Sum_Nb2_nSmallClass[iSmallClass]   = 0 ;
+        mean_NaNb_nSmallClass[iSmallClass] = 0; Sum_NaNb_nSmallClass[iSmallClass]  = 0 ;
 
-  //Initialize all to zero _nSubSample[iSubSample]
-    for( int iSmallClass = 0; iSmallClass < nSmallClass; iSmallClass++){
-      nEntries_nSmallClass[iSmallClass]  = 0;
-      mean_Na_nSmallClass[iSmallClass]   = 0; Sum_Na_nSmallClass[iSmallClass]    = 0 ;
-      mean_Na2_nSmallClass[iSmallClass]  = 0; Sum_Na2_nSmallClass[iSmallClass]   = 0 ;
-      mean_Nb_nSmallClass[iSmallClass]   = 0; Sum_Nb_nSmallClass[iSmallClass]    = 0 ;
-      mean_Nb2_nSmallClass[iSmallClass]  = 0; Sum_Nb2_nSmallClass[iSmallClass]   = 0 ;
-      mean_NaNb_nSmallClass[iSmallClass] = 0; Sum_NaNb_nSmallClass[iSmallClass]  = 0 ;
+        mean_NaCorr_nSmallClass[iSmallClass] = 0 ; Sum_NaCorr_nSmallClass[iSmallClass] = 0;
+        mean_NbCorr_nSmallClass[iSmallClass] = 0 ; Sum_NbCorr_nSmallClass[iSmallClass] = 0;
+      }
+  //__MBWC part - End   ______________________________________________________________
+  //__Subsampling_MBWC - Start _______________________________________________________
+    vector<vector<double>> nEntries_nSubSample_nSmallClass(nSubSample, vector<double>(nSmallClass));
+    double mean_Na_nSubSample_nSmallClass   [nSubSample][nSmallClass]; double Sum_Na_nSubSample_nSmallClass   [nSubSample][nSmallClass] ;
+    double mean_Na2_nSubSample_nSmallClass  [nSubSample][nSmallClass]; double Sum_Na2_nSubSample_nSmallClass  [nSubSample][nSmallClass] ;
+    double mean_Nb_nSubSample_nSmallClass   [nSubSample][nSmallClass]; double Sum_Nb_nSubSample_nSmallClass   [nSubSample][nSmallClass] ;
+    double mean_Nb2_nSubSample_nSmallClass  [nSubSample][nSmallClass]; double Sum_Nb2_nSubSample_nSmallClass  [nSubSample][nSmallClass] ;
+    double mean_NaNb_nSubSample_nSmallClass [nSubSample][nSmallClass]; double Sum_NaNb_nSubSample_nSmallClass [nSubSample][nSmallClass] ;
 
-      mean_NaCorr_nSmallClass[iSmallClass] = 0 ; Sum_NaCorr_nSmallClass[iSmallClass] = 0;
-      mean_NbCorr_nSmallClass[iSmallClass] = 0 ; Sum_NbCorr_nSmallClass[iSmallClass] = 0;
+    //debugger //debugging varaibles to check if everything is working
+    double mean_NaCorr_nSubSample_nSmallClass[nSubSample][nSmallClass] ; double Sum_NaCorr_nSubSample_nSmallClass[nSubSample][nSmallClass] ;
+    double mean_NbCorr_nSubSample_nSmallClass[nSubSample][nSmallClass] ; double Sum_NbCorr_nSubSample_nSmallClass[nSubSample][nSmallClass] ;
+
+    double Raa_Corr_nSubSample_nSmallClass[nSubSample][nSmallClass];
+    double Rbb_Corr_nSubSample_nSmallClass[nSubSample][nSmallClass];
+    double Rab_Corr_nSubSample_nSmallClass[nSubSample][nSmallClass];
+    
+    //Initialize all to zero _nSubSample[iSubSample]
+    for (int iSmallClass=0; iSmallClass<nSmallClass; iSmallClass++){
+      for( int iSubSample = 0; iSubSample<nSubSample; iSubSample++){
+        nEntries_nSubSample_nSmallClass[iSubSample][iSmallClass]  = 0;
+        mean_Na_nSubSample_nSmallClass[iSubSample][iSmallClass]   = 0; Sum_Na_nSubSample_nSmallClass[iSubSample][iSmallClass]    = 0 ;
+        mean_Na2_nSubSample_nSmallClass[iSubSample][iSmallClass]  = 0; Sum_Na2_nSubSample_nSmallClass[iSubSample][iSmallClass]   = 0 ;
+        mean_Nb_nSubSample_nSmallClass[iSubSample][iSmallClass]   = 0; Sum_Nb_nSubSample_nSmallClass[iSubSample][iSmallClass]    = 0 ;
+        mean_Nb2_nSubSample_nSmallClass[iSubSample][iSmallClass]  = 0; Sum_Nb2_nSubSample_nSmallClass[iSubSample][iSmallClass]   = 0 ;
+        mean_NaNb_nSubSample_nSmallClass[iSubSample][iSmallClass] = 0; Sum_NaNb_nSubSample_nSmallClass[iSubSample][iSmallClass]  = 0 ;
+
+        mean_NaCorr_nSubSample_nSmallClass[iSubSample][iSmallClass] = 0 ; Sum_NaCorr_nSubSample_nSmallClass[iSubSample][iSmallClass] = 0;
+        mean_NbCorr_nSubSample_nSmallClass[iSubSample][iSmallClass] = 0 ; Sum_NbCorr_nSubSample_nSmallClass[iSubSample][iSmallClass] = 0;
+      }
     }
+  //__Subsampling_MBWC - End ______________________________________________________
 
   //_______________________ Entries Per Subsample____________________________________________________
   //Find Entries Per SubSample
@@ -1491,8 +1523,8 @@ void SparseAnalysis(const T& hSparseList, const int& nClass, const std::vector<d
   auto Start1 = chrono::high_resolution_clock::now();
   auto Start2 = chrono::high_resolution_clock::now();
   
-  int classNumber = -1;
-  int smallClassNumber = -1;
+  int classIDX = -1;
+  int smallClassIDX = -1;
   long int countFillCheck = 0;
 
   const int nHist = hSparseList.size();
@@ -1522,55 +1554,55 @@ void SparseAnalysis(const T& hSparseList, const int& nClass, const std::vector<d
       if(pairType == 1) { Na = int(Xvar[axisA0]) + int(Xvar[axisA1]); Nb = int(Xvar[axisB0])                    ; }
       if(pairType == 2) { Na = int(Xvar[axisA0]) + int(Xvar[axisA1]); Nb = int(Xvar[axisB0]) + int(Xvar[axisB1]); }
 
-      classNumber = -1;
+      classIDX = -1;
       for(int iClass = 0 ; iClass < nClass; iClass++){
         //The Variable is integer
         if(classLow[iClass] <= static_cast<int>(Xvar[axisCl]) && static_cast<int>(Xvar[axisCl]) <= classUp[iClass]){
-          classNumber = iClass;
+          classIDX = iClass;
           break;
         }
       }//classloop block
 
-      if(classNumber == -1) {
-        cout<<"ERROR :: classNumber = -1 :: "<<Xvar[axisCl]<<endl;
+      if(classIDX == -1) {
+        cout<<"ERROR :: classIDX = -1 :: "<<Xvar[axisCl]<<endl;
       }
 
-      smallClassNumber = -1;
+      smallClassIDX = -1;
       for(int iSmallClass = 0 ; iSmallClass < nSmallClass; iSmallClass++){
         if(smallClassLow[iSmallClass] <= static_cast<int>(Xvar[axisCl]) && static_cast<int>(Xvar[axisCl]) <= smallClassUp[iSmallClass]){
-          smallClassNumber = iSmallClass;
+          smallClassIDX = iSmallClass;
           break;
         }
       }//classloop block
 
-      if(smallClassNumber == -1) {
-        cout<<"ERROR :: smallClassNumber = -1 :: "<<Xvar[axisCl]<<endl;
+      if(smallClassIDX == -1) {
+        cout<<"ERROR :: smallClassIDX = -1 :: "<<Xvar[axisCl]<<endl;
       }
 
-      if( nClassIDX_smallClass[smallClassNumber] != classNumber){
-        cout<<"ERROR :: nClassIDX_smallClass[smallClassNumber] != classNumber :: "<<endl;
+      if( nClassIDX_smallClass[smallClassIDX] != classIDX){
+        cout<<"ERROR :: nClassIDX_smallClass[smallClassIDX] != classIDX :: "<<endl;
       }
 
-      Sum_Na[classNumber]   += iBinEntries*Na;
-      Sum_Na2[classNumber]  += iBinEntries*Na*Na;
-      Sum_Nb[classNumber]   += iBinEntries*Nb;
-      Sum_Nb2[classNumber]  += iBinEntries*Nb*Nb;
-      Sum_NaNb[classNumber] += iBinEntries*Na*Nb;
-      nEntries[classNumber] += iBinEntries;
+      Sum_Na[classIDX]   += iBinEntries*Na;
+      Sum_Na2[classIDX]  += iBinEntries*Na*Na;
+      Sum_Nb[classIDX]   += iBinEntries*Nb;
+      Sum_Nb2[classIDX]  += iBinEntries*Nb*Nb;
+      Sum_NaNb[classIDX] += iBinEntries*Na*Nb;
+      nEntries[classIDX] += iBinEntries;
   
-      Sum_NaCorr[classNumber] += iBinEntries*(Na*(Na-1));
-      Sum_NbCorr[classNumber] += iBinEntries*(Nb*(Nb-1));
+      Sum_NaCorr[classIDX] += iBinEntries*(Na*(Na-1));
+      Sum_NbCorr[classIDX] += iBinEntries*(Nb*(Nb-1));
 
       //____________Small Class Analysis For CBWC__________________________________
-      Sum_Na_nSmallClass[smallClassNumber]    += iBinEntries*Na;
-      Sum_Na2_nSmallClass[smallClassNumber]   += iBinEntries*Na*Na;
-      Sum_Nb_nSmallClass[smallClassNumber]    += iBinEntries*Nb;
-      Sum_Nb2_nSmallClass[smallClassNumber]   += iBinEntries*Nb*Nb;
-      Sum_NaNb_nSmallClass[smallClassNumber]  += iBinEntries*Na*Nb;
-      nEntries_nSmallClass[smallClassNumber]  += iBinEntries;
+      Sum_Na_nSmallClass[smallClassIDX]    += iBinEntries*Na;
+      Sum_Na2_nSmallClass[smallClassIDX]   += iBinEntries*Na*Na;
+      Sum_Nb_nSmallClass[smallClassIDX]    += iBinEntries*Nb;
+      Sum_Nb2_nSmallClass[smallClassIDX]   += iBinEntries*Nb*Nb;
+      Sum_NaNb_nSmallClass[smallClassIDX]  += iBinEntries*Na*Nb;
+      nEntries_nSmallClass[smallClassIDX]  += iBinEntries;
   
-      Sum_NaCorr_nSmallClass[smallClassNumber] += iBinEntries*(Na*(Na-1));
-      Sum_NbCorr_nSmallClass[smallClassNumber] += iBinEntries*(Nb*(Nb-1));
+      Sum_NaCorr_nSmallClass[smallClassIDX] += iBinEntries*(Na*(Na-1));
+      Sum_NbCorr_nSmallClass[smallClassIDX] += iBinEntries*(Nb*(Nb-1));
 
       //____________Subsample Analysis__________________________________
       for (int64_t iEntry = 0 ; iEntry < iBinEntries; iEntry++){
@@ -1581,21 +1613,31 @@ void SparseAnalysis(const T& hSparseList, const int& nClass, const std::vector<d
         SubSampleEntryCounter[iSubSample]++;
         if(SubSampleEntryCounter[iSubSample] > EntriesPerSubSample){ cout<<"Problem :"<<iSubSample<<" :: ";}
   
-        Sum_Na_nSubSample[iSubSample][classNumber]   += 1*Na;
-        Sum_Na2_nSubSample[iSubSample][classNumber]  += 1*Na*Na;
-        Sum_Nb_nSubSample[iSubSample][classNumber]   += 1*Nb;
-        Sum_Nb2_nSubSample[iSubSample][classNumber]  += 1*Nb*Nb;
-        Sum_NaNb_nSubSample[iSubSample][classNumber] += 1*Na*Nb;
-        nEntries_nSubSample[iSubSample][classNumber] += 1;
+        Sum_Na_nSubSample[iSubSample][classIDX]   += 1*Na;
+        Sum_Na2_nSubSample[iSubSample][classIDX]  += 1*Na*Na;
+        Sum_Nb_nSubSample[iSubSample][classIDX]   += 1*Nb;
+        Sum_Nb2_nSubSample[iSubSample][classIDX]  += 1*Nb*Nb;
+        Sum_NaNb_nSubSample[iSubSample][classIDX] += 1*Na*Nb;
+        nEntries_nSubSample[iSubSample][classIDX] += 1;
     
-        Sum_NaCorr_nSubSample[iSubSample][classNumber] += 1*(Na*(Na-1));
-        Sum_NbCorr_nSubSample[iSubSample][classNumber] += 1*(Nb*(Nb-1));  
+        Sum_NaCorr_nSubSample[iSubSample][classIDX] += 1*(Na*(Na-1));
+        Sum_NbCorr_nSubSample[iSubSample][classIDX] += 1*(Nb*(Nb-1));
+        
+        Sum_Na_nSubSample_nSmallClass[iSubSample][smallClassIDX]   += 1*Na;
+        Sum_Na2_nSubSample_nSmallClass[iSubSample][smallClassIDX]  += 1*Na*Na;
+        Sum_Nb_nSubSample_nSmallClass[iSubSample][smallClassIDX]   += 1*Nb;
+        Sum_Nb2_nSubSample_nSmallClass[iSubSample][smallClassIDX]  += 1*Nb*Nb;
+        Sum_NaNb_nSubSample_nSmallClass[iSubSample][smallClassIDX] += 1*Na*Nb;
+        nEntries_nSubSample_nSmallClass[iSubSample][smallClassIDX] += 1;
+    
+        Sum_NaCorr_nSubSample_nSmallClass[iSubSample][smallClassIDX] += 1*(Na*(Na-1));
+        Sum_NbCorr_nSubSample_nSmallClass[iSubSample][smallClassIDX] += 1*(Nb*(Nb-1));
       } //Bin Entries Loop ends
       //___________________Debug Histogram______________
       //Histogram filling consumes a lot of time 
       for(int iAxis = 0 ; iAxis < nDim ; iAxis++){
         h1D[iAxis]                     ->Fill(Xvar[iAxis], iBinEntries);
-        h1D_nClass[iAxis][classNumber] ->Fill(Xvar[iAxis], iBinEntries);
+        h1D_nClass[iAxis][classIDX] ->Fill(Xvar[iAxis], iBinEntries);
       }
     } //Bin loop ends
     // delete hSparse; //don't delete, in a list the pointer gets deleted and code will crash
@@ -1772,18 +1814,18 @@ void SparseAnalysis(const T& hSparseList, const int& nClass, const std::vector<d
   SetXYRange(h1D[7],1,-1.5, 40.5, 0, 0.0,0.0);
   SetXYRange(h1D[8],1,-1.5, 40.5, 0, 0.0,0.0);
 
-  for (classNumber=0; classNumber<nClass; classNumber++){
-    double x0Low = h1D_nClass[0][classNumber]->GetBinLowEdge(getFirstFilledBin(h1D_nClass[0][classNumber])) -3.0*h1D_nClass[0][classNumber]->GetBinWidth(getFirstFilledBin(h1D_nClass[0][classNumber]));;  //
-    double x0Up  = h1D_nClass[0][classNumber]->GetBinLowEdge(getLastFilledBin (h1D_nClass[0][classNumber])) +3.0*h1D_nClass[0][classNumber]->GetBinWidth(getLastFilledBin (h1D_nClass[0][classNumber]));;  //
-    SetXYRange(h1D_nClass[0][classNumber],1,x0Low,x0Up, 0, 0.0,0.0);
-    SetXYRange(h1D_nClass[1][classNumber],1,-1.5,150.5, 0, 0.0,0.0);
-    SetXYRange(h1D_nClass[2][classNumber],1,-1.5, 20.5, 0, 0.0,0.0);
-    SetXYRange(h1D_nClass[3][classNumber],1,-1.5, 10.5, 0, 0.0,0.0);
-    SetXYRange(h1D_nClass[4][classNumber],1,-1.5, 10.5, 0, 0.0,0.0);
-    SetXYRange(h1D_nClass[5][classNumber],1,-1.5,100.5, 0, 0.0,0.0);
-    SetXYRange(h1D_nClass[6][classNumber],1,-1.5,100.5, 0, 0.0,0.0);
-    SetXYRange(h1D_nClass[7][classNumber],1,-1.5, 40.5, 0, 0.0,0.0);
-    SetXYRange(h1D_nClass[8][classNumber],1,-1.5, 40.5, 0, 0.0,0.0);
+  for (classIDX=0; classIDX<nClass; classIDX++){
+    double x0Low = h1D_nClass[0][classIDX]->GetBinLowEdge(getFirstFilledBin(h1D_nClass[0][classIDX])) -3.0*h1D_nClass[0][classIDX]->GetBinWidth(getFirstFilledBin(h1D_nClass[0][classIDX]));;  //
+    double x0Up  = h1D_nClass[0][classIDX]->GetBinLowEdge(getLastFilledBin (h1D_nClass[0][classIDX])) +3.0*h1D_nClass[0][classIDX]->GetBinWidth(getLastFilledBin (h1D_nClass[0][classIDX]));;  //
+    SetXYRange(h1D_nClass[0][classIDX],1,x0Low,x0Up, 0, 0.0,0.0);
+    SetXYRange(h1D_nClass[1][classIDX],1,-1.5,150.5, 0, 0.0,0.0);
+    SetXYRange(h1D_nClass[2][classIDX],1,-1.5, 20.5, 0, 0.0,0.0);
+    SetXYRange(h1D_nClass[3][classIDX],1,-1.5, 10.5, 0, 0.0,0.0);
+    SetXYRange(h1D_nClass[4][classIDX],1,-1.5, 10.5, 0, 0.0,0.0);
+    SetXYRange(h1D_nClass[5][classIDX],1,-1.5,100.5, 0, 0.0,0.0);
+    SetXYRange(h1D_nClass[6][classIDX],1,-1.5,100.5, 0, 0.0,0.0);
+    SetXYRange(h1D_nClass[7][classIDX],1,-1.5, 40.5, 0, 0.0,0.0);
+    SetXYRange(h1D_nClass[8][classIDX],1,-1.5, 40.5, 0, 0.0,0.0);
   }
 
   // if(DrawHistograms == 1){
@@ -1880,7 +1922,7 @@ void executeSparseAnalysisPart(const I &inFiles,  const int& nClass, std::vector
   vector<int> iBinUp(nClass);
 
   getQuantileBinProperEdges(histAxis, nQuantilePoints, quantileArray, nQuantileArray,
-    classLow, classUp, iBinLow, iBinUp);
+     nClass, classLow, classUp, iBinLow, iBinUp);
 
   //treat each bin separately
   //Find the number of small bins available.
@@ -2136,7 +2178,7 @@ void NuDynMultiFileRead(){
 
   std::vector<double> classLow(nClass);
   std::vector<double> classUp(nClass);
-  int classNumber = 0;
+  int classIDX = 0;
   for(int i = 0; i < nClass; i++) { classLow[i] = i * 100.0/double(nClass) ; classUp[i] = (i+1) * 100.0/double(nClass) ;}
   classLow[0] = -1.0; classUp[nClass-1] = 101.0;
 
@@ -2190,19 +2232,19 @@ void NuDynMultiFileRead(){
 
     TH1D* hK0s_nClass_mK0s[nClass];
     string nameString = "hK0s_nClass_mK0s";
-    classNumber = 0;
+    classIDX = 0;
 
     // void GetProjectionHist()
     int nTotalCount = 0; 
-    for(classNumber = 0 ; classNumber < nClass; classNumber++){
+    for(classIDX = 0 ; classIDX < nClass; classIDX++){
       // TH2F hClone = 
-      hK0s_5_01_centFTOC_mK0s->GetXaxis()->SetRangeUser(classLow[classNumber], classUp[classNumber]);
-      hK0s_nClass_mK0s[classNumber] = hK0s_5_01_centFTOC_mK0s->ProjectionY();
-      hK0s_nClass_mK0s[classNumber]->SetName(Form("%s_%d",nameString.c_str(),classNumber));
-      hK0s_nClass_mK0s[classNumber]->SetTitle(Form("K0s Mass :: centFT0C[%2.0f,%2.0f]",classLow[classNumber], classUp[classNumber]));
+      hK0s_5_01_centFTOC_mK0s->GetXaxis()->SetRangeUser(classLow[classIDX], classUp[classIDX]);
+      hK0s_nClass_mK0s[classIDX] = hK0s_5_01_centFTOC_mK0s->ProjectionY();
+      hK0s_nClass_mK0s[classIDX]->SetName(Form("%s_%d",nameString.c_str(),classIDX));
+      hK0s_nClass_mK0s[classIDX]->SetTitle(Form("K0s Mass :: centFT0C[%2.0f,%2.0f]",classLow[classIDX], classUp[classIDX]));
       // CanvasCounter++; c[CanvasCounter] = new TCanvas();
-      // hK0s_nClass_mK0s[classNumber]->Draw();
-      nTotalCount += hK0s_nClass_mK0s[classNumber]->GetEntries();
+      // hK0s_nClass_mK0s[classIDX]->Draw();
+      nTotalCount += hK0s_nClass_mK0s[classIDX]->GetEntries();
     }
 
     cout<<"nTotalCount = "<<nTotalCount<<" :: Entries = "<<hK0s_5_01_centFTOC_mK0s->GetEntries()<<endl;
