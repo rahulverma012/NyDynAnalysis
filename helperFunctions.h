@@ -817,20 +817,29 @@ void SetXYRange(T hist, bool setXaxis = false , double xLow = 0 , double xUp = 0
     if(totEntryCounter != histAxis->GetEntries()){ cout<<"ERROR :: total entries in classes are not matching"<<endl;}
   }
 
+  enum MulitplicityAxisType{
+    kIntTypeAxis=0,
+    kFloatTypeAxis
+  };
   template<typename T> 
   void getSmallBinProperEdges(const T& histAxis, const int& nSmallClass, vector<double>& smallClassLow, vector<double>& smallClassUp, 
                               vector<int>& iBinLow_smallClass, vector<int>& iBinUp_smallClass, vector<int>& nClassIDX_smallClass, 
                               const int &nClass, const vector<double>& classLow, const vector<double>& classUp,
-                              const int& firstFilledBin, const int& lastFilledBin){
+                              const int& firstFilledBin, const int& lastFilledBin, const int mode, std::string var = "mult"){
     cout<<"Processing smallClass information for Multiplicity/Centraility bin width correction"<<endl;
     int binPositionsLow  = firstFilledBin;
     // int binPositionsHigh = lastFilledBin;
     for(int i = 0; i < nSmallClass; i++) {
       smallClassLow[i] = histAxis->GetBinLowEdge(binPositionsLow + i) ; 
       //For integer Bins 
-      smallClassUp[i]  = smallClassLow[i] ;//+ histAxis->GetBinWidth(i);
-      for(int iClass = 0 ; iClass < nClass; iClass++) {
-        if( classLow[iClass] <= smallClassLow[i]  && smallClassLow[i]  <= classUp[iClass]) { nClassIDX_smallClass[i] = iClass; break; }
+      if      (mode == kIntTypeAxis){ smallClassUp[i]  = smallClassLow[i] ;}//+ histAxis->GetBinWidth(i);
+      else if (mode == kFloatTypeAxis){ smallClassUp[i]  = histAxis->GetBinLowEdge(binPositionsLow + i) + histAxis->GetBinWidth(binPositionsLow + i);}
+      for(int iClass = 0 ; iClass < nClass+2; iClass++) {
+        if( smallClassUp[i] < classLow[0]) { nClassIDX_smallClass[i] = 0; break; } 
+        if      (mode == kIntTypeAxis  ){if( classLow[iClass] <= smallClassLow[i]  && smallClassUp[i]  <= classUp[iClass]) { nClassIDX_smallClass[i] = iClass+1; break; }} 
+        else if (mode == kFloatTypeAxis){if( classLow[iClass] <= smallClassLow[i]  && smallClassUp[i]  <  classUp[iClass]) { nClassIDX_smallClass[i] = iClass+1; break; }
+        }
+        if( classUp[nClass-1] <= smallClassLow[i]) { nClassIDX_smallClass[i] = nClass+1; break; } 
       }
     }
     // smallClassLow[0] = -1.0; smallClassUp[nSmallClass-1] = 101.0;
@@ -838,17 +847,22 @@ void SetXYRange(T hist, bool setXaxis = false , double xLow = 0 , double xUp = 0
     int64_t totEntryCounter = 0;
     for(int i=0 ; i < nSmallClass ; i++){
       iBinLow_smallClass[i] = histAxis->FindBin(smallClassLow[i]);
-      iBinUp_smallClass[i]  = histAxis->FindBin(smallClassUp[i]);
-      cout<<"i = "<<std::setw(3)<<i<<" :: mult \u2208 "<<"["<<std::setw(5)<<smallClassLow[i]<<","<<std::setw(5)<<smallClassUp[i]<<"] "
-      <<" :: binPos \u2208 ["<<std::setw(5)<<iBinLow_smallClass[i]<<","<<std::setw(5)<<iBinUp_smallClass[i]<<"] "
+      if     (mode == kIntTypeAxis  ){ iBinUp_smallClass[i]  = histAxis->FindBin(smallClassUp[i]);}  //Here smallClassLow[i] and smallClassUp[i] are same
+      else if(mode == kFloatTypeAxis){ iBinUp_smallClass[i]  = histAxis->FindBin(smallClassLow[i]);} //Here smallClassLow[i] and smallClassUp[i] are differernt
+      cout<<"i = "<<std::setw(3)<<i<<" :: "<<var<<" \u2208 "<<"["<<std::setw(5)<<smallClassLow[i]<<","<<std::setw(5)<<smallClassUp[i];
+      if     (mode == kIntTypeAxis   ){ cout<<"] ";}
+      else if(mode == kFloatTypeAxis ){ cout<<") ";}
+      cout<<" :: binPos \u2208 ["<<std::setw(5)<<iBinLow_smallClass[i]<<","<<std::setw(5)<<iBinUp_smallClass[i]<<"] "
       <<" :: nClassIDX = "<<nClassIDX_smallClass[i]
       <<" :: \u222B = "<<std::setw(11)<<histAxis->Integral(iBinLow_smallClass[i], iBinUp_smallClass[i])
       <<" :: \u0025 = "<<100.0*static_cast<double>(histAxis->Integral(iBinLow_smallClass[i], iBinUp_smallClass[i]))/static_cast<double>(histAxis->GetEntries())
       <<endl;
-      totEntryCounter += histAxis->Integral(histAxis->FindBin(smallClassLow[i]), histAxis->FindBin(smallClassUp[i]));
+      if     (mode == kIntTypeAxis  ){totEntryCounter += histAxis->Integral(histAxis->FindBin(smallClassLow[i]), histAxis->FindBin(smallClassUp[i]));}  //Here smallClassLow[i] and smallClassUp[i] are same
+      else if(mode == kFloatTypeAxis){totEntryCounter += histAxis->Integral(histAxis->FindBin(smallClassLow[i]), histAxis->FindBin(smallClassLow[i]));} //Here smallClassLow[i] and smallClassUp[i] are differernt
     }
     if(totEntryCounter != histAxis->GetEntries()){ cout<<"ERROR :: total entries in classes are not matching"<<endl;}
   }
+
 
   template<typename T>
   void checkClassificationHist(const std::vector<T>& h1D_nClass, const int& axisCl, const int& nClass){
